@@ -1,0 +1,40 @@
+<section class="content-card">
+  <div class="card-heading card-heading-list">
+    <div><h2>{{ vendoUsuario ? 'Endereços de ' + vendoUsuario.nome : 'Todos os endereços' }} <span class="total-pill">{{ pagina.totalElements }}</span></h2><p>{{ vendoUsuario ? vendoUsuario.email : 'Endereços associados aos perfis cadastrados' }}</p></div>
+    <div class="list-tools">
+      @if (vendoUsuario) { <button type="button" class="subtle-button" (click)="showAll.emit()">Ver todos <span>→</span></button> }
+      <label class="sort-control">Ordenar por
+        <select [value]="ordenacao" (change)="onSortChange($event)">
+          <option value="createdAt,desc">Mais recentes</option>
+          <option value="createdAt,asc">Mais antigos</option>
+        </select>
+      </label>
+    </div>
+  </div>
+  @if (isLoading) {
+    <div class="table-loading"><span class="spinner"></span> Carregando endereços...</div>
+  } @else if (pagina.content.length === 0) {
+    <div class="empty-state"><span class="empty-icon">⌖</span><strong>Nenhum endereço cadastrado</strong><span>Os endereços adicionados aparecerão aqui.</span></div>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ENDEREÇO</th><th>CEP</th>@if (isAdmin && !vendoUsuario) { <th>USUÁRIO</th> }<th>CADASTRO</th><th>AÇÕES</th></tr></thead>
+        <tbody>
+          @for (endereco of pagina.content; track endereco.id) {
+            <tr>
+              <td><div class="address-cell"><span class="address-pin">⌖</span><span><strong>{{ endereco.rua }}, {{ endereco.numero }}</strong><small>{{ endereco.bairro }} · {{ endereco.cidade }}/{{ endereco.estado }}{{ endereco.complemento ? ' · ' + endereco.complemento : '' }}</small></span></div></td>
+              <td><span class="cep-chip">{{ endereco.cep }}</span></td>
+              @if (isAdmin && !vendoUsuario) { <td>{{ nomeUsuario(endereco) }}</td> }
+              <td>{{ endereco.createdAt | date: 'dd/MM/yyyy' }}</td>
+              <td><div class="table-actions"><button type="button" class="row-action" (click)="edit.emit(endereco)" aria-label="Editar endereço">✎</button><button type="button" class="row-action danger-action" (click)="delete.emit(endereco)" aria-label="Excluir endereço">×</button></div></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <span>Mostrando {{ pagina.content.length }} de {{ pagina.totalElements }} endereços</span>
+      <div><button type="button" class="page-button" [disabled]="pagina.first" (click)="pageChange.emit(pagina.page - 1)">← Anterior</button><span class="page-number">{{ pagina.page + 1 }} / {{ pagina.totalPages || 1 }}</span><button type="button" class="page-button" [disabled]="pagina.last" (click)="pageChange.emit(pagina.page + 1)">Próxima →</button></div>
+    </div>
+  }
+</section>

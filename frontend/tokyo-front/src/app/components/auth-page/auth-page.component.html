@@ -1,0 +1,89 @@
+<main class="auth-page">
+  <section class="auth-story">
+    <a class="brand brand-light" href="/" aria-label="Tokyo, início">
+      <span class="brand-mark">t</span>
+      <span>tokyo<span class="brand-dot">.</span></span>
+    </a>
+    <div class="story-copy">
+      <span class="eyebrow eyebrow-light">GESTÃO SIMPLES, ROTINA LEVE</span>
+      <h1>Um lugar para organizar cada detalhe.</h1>
+      <p>Cuide das pessoas e dos endereços da sua operação em um só espaço.</p>
+      <div class="story-art" aria-hidden="true">
+        <div class="art-orbit orbit-one"></div>
+        <div class="art-orbit orbit-two"></div>
+        <div class="art-card">
+          <div class="art-card-top"><span></span><span></span><span></span></div>
+          <div class="art-avatar">A</div>
+          <div class="art-lines"><i></i><i></i><i></i></div>
+          <div class="art-pin">⌖</div>
+        </div>
+        <div class="art-spark spark-one">✳</div>
+        <div class="art-spark spark-two">✦</div>
+      </div>
+    </div>
+    <div class="story-footer"><span>●</span> Plataforma de gestão de usuários e endereços</div>
+  </section>
+
+  <section class="auth-content">
+    <div class="auth-mobile-brand">
+      <a class="brand" href="/" aria-label="Tokyo, início">
+        <span class="brand-mark">t</span>
+        <span>tokyo<span class="brand-dot">.</span></span>
+      </a>
+    </div>
+    <div class="auth-form-wrap">
+      @if (authView === 'login') {
+        <span class="eyebrow">BEM-VINDO DE VOLTA</span>
+        <h2>Acesse sua conta</h2>
+        <p class="form-intro">Entre para continuar de onde parou.</p>
+
+        <form class="form-stack" (ngSubmit)="submitLogin()">
+          <label for="login-email">E-mail</label>
+          <input id="login-email" type="email" name="loginEmail" [(ngModel)]="loginEmail"
+            placeholder="voce@empresa.com" autocomplete="email" required maxlength="180">
+          <label for="login-password">Senha</label>
+          <input id="login-password" type="password" name="loginPassword" [(ngModel)]="loginPassword"
+            placeholder="Sua senha" autocomplete="current-password" required>
+          <button class="button button-primary button-wide" type="submit" [disabled]="isSubmitting()">
+            @if (isSubmitting()) { <span class="button-spinner"></span> Entrando... }
+            @else { Entrar <span aria-hidden="true">→</span> }
+          </button>
+        </form>
+
+        <p class="auth-switch">Ainda não tem uma conta?
+          <button type="button" class="text-button" (click)="authView = 'register'">Criar conta</button>
+        </p>
+        <div class="secure-note"><span aria-hidden="true">♧</span> Seus dados são protegidos e usados apenas para gestão da conta.</div>
+      } @else {
+        <span class="eyebrow">COMECE POR AQUI</span>
+        <h2>Crie sua conta</h2>
+        <p class="form-intro">Leva só um instante para organizar tudo.</p>
+
+        <form class="form-stack" (ngSubmit)="submitRegistration()">
+          <label for="register-name">Nome completo</label>
+          <input id="register-name" type="text" name="registerName" [(ngModel)]="registration.nome"
+            placeholder="Como podemos te chamar?" autocomplete="name" required maxlength="120">
+          <label for="register-email">E-mail</label>
+          <input id="register-email" type="email" name="registerEmail" [(ngModel)]="registration.email"
+            placeholder="voce@empresa.com" autocomplete="email" required maxlength="180">
+          <label for="register-password">Senha</label>
+          <input id="register-password" type="password" name="registerPassword" [(ngModel)]="registration.senha"
+            placeholder="Mínimo de 8 caracteres" autocomplete="new-password" required minlength="8" maxlength="72">
+          <label for="register-confirm">Confirme sua senha</label>
+          <input id="register-confirm" type="password" name="registerConfirm" [(ngModel)]="registration.confirmarSenha"
+            placeholder="Digite a senha novamente" autocomplete="new-password" required minlength="8" maxlength="72">
+          <button class="button button-primary button-wide" type="submit" [disabled]="isSubmitting()">
+            @if (isSubmitting()) { <span class="button-spinner"></span> Criando conta... }
+            @else { Criar conta <span aria-hidden="true">→</span> }
+          </button>
+        </form>
+
+        <p class="auth-switch">Já tem uma conta?
+          <button type="button" class="text-button" (click)="authView = 'login'">Fazer login</button>
+        </p>
+        <div class="secure-note"><span aria-hidden="true">♧</span> Sua conta é criada com o perfil de usuário padrão.</div>
+      }
+    </div>
+    <p class="auth-copyright">© 2026 Tokyo. Feito para simplificar.</p>
+  </section>
+</main>

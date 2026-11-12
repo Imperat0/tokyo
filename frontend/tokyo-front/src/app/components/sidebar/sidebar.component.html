@@ -1,0 +1,40 @@
+<aside class="sidebar">
+  <a class="brand" href="/" aria-label="Tokyo, início">
+    <span class="brand-mark">t</span>
+    <span>tokyo<span class="brand-dot">.</span></span>
+  </a>
+
+  <div class="workspace-label">ESPAÇO DE TRABALHO</div>
+  <nav class="side-nav" aria-label="Navegação principal">
+    <button type="button" class="nav-link" [class.active]="activeSection === 'overview'"
+      (click)="sectionChange.emit('overview')">
+      <span class="nav-icon">⌂</span> Visão geral
+    </button>
+    @if (isAdmin) {
+      <button type="button" class="nav-link" [class.active]="activeSection === 'users'"
+        (click)="sectionChange.emit('users')">
+        <span class="nav-icon">♙</span> Usuários
+        <span class="nav-count">{{ usersCount }}</span>
+      </button>
+    }
+    <button type="button" class="nav-link" [class.active]="activeSection === 'addresses'"
+      (click)="sectionChange.emit('addresses')">
+      <span class="nav-icon">⌖</span> Endereços
+      <span class="nav-count">{{ addressesCount }}</span>
+    </button>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="sidebar-help">
+      <span class="help-icon">✳</span>
+      <div><strong>Precisa de ajuda?</strong><small>Estamos por aqui.</small></div>
+      <span class="help-arrow">↗</span>
+    </div>
+    <button type="button" class="profile-button" (click)="profileClick.emit()">
+      <span class="avatar">{{ currentUser.nome.slice(0, 1).toUpperCase() }}</span>
+      <span class="profile-copy"><strong>{{ currentUser.nome }}</strong><small>{{ isAdmin ? 'Administrador' : 'Usuário' }}</small></span>
+      <span class="profile-menu">···</span>
+    </button>
+    <button type="button" class="logout-link" (click)="signOut.emit()"><span>↪</span> Sair da conta</button>
+  </div>
+</aside>

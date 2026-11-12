@@ -1,0 +1,85 @@
+<section class="welcome-banner">
+  <div class="welcome-copy">
+    <span class="banner-kicker">{{ isAdmin ? 'VISÃO DO SEU NEGÓCIO' : 'SEU ESPAÇO, DO SEU JEITO' }}</span>
+    <h2>{{ isAdmin ? 'Tudo em ordem por aqui.' : 'Um bom começo para manter tudo no lugar.' }}</h2>
+    <p>{{ isAdmin ? 'Acompanhe seus usuários e mantenha os dados sempre atualizados.' : 'Seus dados e endereços ficam organizados em um só lugar.' }}</p>
+    <button type="button" class="banner-link" (click)="sectionChange.emit(isAdmin ? 'users' : 'addresses')">
+      {{ isAdmin ? 'Gerenciar usuários' : 'Ver meus endereços' }} <span>→</span>
+    </button>
+  </div>
+  <div class="banner-illustration" aria-hidden="true">
+    <div class="banner-circle circle-back"></div>
+    <div class="banner-circle circle-front"></div>
+    <div class="banner-spark">✦</div>
+    <div class="banner-pin">⌖</div>
+  </div>
+</section>
+
+<section class="stats-grid" aria-label="Resumo">
+  <article class="stat-card">
+    <div class="stat-icon stat-violet">♙</div>
+    <div class="stat-label">{{ isAdmin ? 'Usuários cadastrados' : 'Seu perfil' }}</div>
+    <div class="stat-value">{{ isAdmin ? usuarios.totalElements : 'Ativo' }}</div>
+    <div class="stat-caption">{{ isAdmin ? 'Pessoas na plataforma' : 'Conta pronta para usar' }}</div>
+  </article>
+  <article class="stat-card">
+    <div class="stat-icon stat-orange">⌖</div>
+    <div class="stat-label">{{ isAdmin ? 'Endereços cadastrados' : 'Seus endereços' }}</div>
+    <div class="stat-value">{{ enderecos.totalElements }}</div>
+    <div class="stat-caption">{{ isAdmin ? 'Em todos os cadastros' : 'Vinculados à sua conta' }}</div>
+  </article>
+  <article class="stat-card stat-card-accent">
+    <div class="stat-icon stat-green">✓</div>
+    <div class="stat-label">Status da conta</div>
+    <div class="stat-value stat-status">Tudo certo</div>
+    <div class="stat-caption">Acesso protegido por autenticação</div>
+  </article>
+</section>
+
+@if (isAdmin) {
+  <section class="content-card">
+    <div class="card-heading">
+      <div><h2>Usuários recentes</h2><p>Os cadastros mais recentes da plataforma</p></div>
+      <button type="button" class="subtle-button" (click)="sectionChange.emit('users')">Ver todos <span>→</span></button>
+    </div>
+    @if (isLoading) {
+      <div class="table-loading"><span class="spinner"></span> Carregando dados...</div>
+    } @else if (usuariosRecentes.length === 0) {
+      <div class="empty-state"><span class="empty-icon">♙</span><strong>Nenhum usuário por aqui ainda</strong><span>Quando alguém criar uma conta, ela aparecerá nesta lista.</span></div>
+    } @else {
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>USUÁRIO</th><th>PERFIL</th><th>CADASTRO</th><th></th></tr></thead>
+          <tbody>
+            @for (usuario of usuariosRecentes; track usuario.id) {
+              <tr>
+                <td><div class="person-cell"><span class="avatar avatar-table">{{ usuario.nome.slice(0, 1).toUpperCase() }}</span><span><strong>{{ usuario.nome }}</strong><small>{{ usuario.email }}</small></span></div></td>
+                <td><span class="role-badge" [class.role-admin]="usuario.perfil === 'ADMIN'">{{ usuario.perfil === 'ADMIN' ? 'Admin' : 'Usuário' }}</span></td>
+                <td>{{ usuario.createdAt | date: 'dd/MM/yyyy' }}</td>
+                <td><button class="row-action" type="button" (click)="viewUserAddresses.emit(usuario)" [attr.aria-label]="'Ver endereços de ' + usuario.nome">→</button></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+} @else {
+  <section class="content-card">
+    <div class="card-heading">
+      <div><h2>Seus endereços</h2><p>Endereços vinculados ao seu perfil</p></div>
+      <button type="button" class="subtle-button" (click)="sectionChange.emit('addresses')">Ver todos <span>→</span></button>
+    </div>
+    @if (isLoading) {
+      <div class="table-loading"><span class="spinner"></span> Carregando dados...</div>
+    } @else if (enderecos.content.length === 0) {
+      <div class="empty-state"><span class="empty-icon">⌖</span><strong>Seu primeiro endereço começa aqui</strong><span>Adicione um endereço para deixá-lo sempre à mão.</span><button type="button" class="button button-outline" (click)="addAddress.emit()">＋ Adicionar endereço</button></div>
+    } @else {
+      <div class="address-preview-grid">
+        @for (endereco of enderecos.content.slice(0, 3); track endereco.id) {
+          <article class="address-preview"><span class="address-pin">⌖</span><div><strong>{{ endereco.rua }}, {{ endereco.numero }}</strong><p>{{ endereco.bairro }} · {{ endereco.cidade }}/{{ endereco.estado }}</p><small>CEP {{ endereco.cep }}</small></div><button type="button" class="row-action" (click)="editAddress.emit(endereco)" aria-label="Editar endereço">···</button></article>
+        }
+      </div>
+    }
+  </section>
+}

@@ -1,0 +1,17 @@
+<div class="modal-backdrop" (click)="closed.emit()">
+  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="user-modal-title" (click)="$event.stopPropagation()">
+    <div class="modal-heading"><div><span class="eyebrow">{{ usuario ? 'PERFIL' : 'NOVO CADASTRO' }}</span><h2 id="user-modal-title">{{ usuario ? 'Editar usuário' : 'Adicionar usuário' }}</h2></div><button type="button" class="modal-close" (click)="closed.emit()" aria-label="Fechar">×</button></div>
+    <p class="modal-intro">{{ usuario ? 'Atualize as informações do perfil. Deixe a senha vazia para mantê-la.' : 'Preencha os dados para criar um novo acesso.' }}</p>
+    <form class="form-stack modal-form" (ngSubmit)="submit()">
+      <label for="user-name">Nome completo</label>
+      <input id="user-name" type="text" name="userName" [(ngModel)]="formulario.nome" required maxlength="120">
+      <label for="user-email">E-mail</label>
+      <input id="user-email" type="email" name="userEmail" [(ngModel)]="formulario.email" required maxlength="180">
+      <label for="user-password">Senha {{ usuario ? '(opcional)' : '' }}</label>
+      <input id="user-password" type="password" name="userPassword" [(ngModel)]="formulario.senha"
+        [required]="!usuario" minlength="8" maxlength="72"
+        [placeholder]="usuario ? 'Deixe em branco para manter a atual' : 'Mínimo de 8 caracteres'">
+      <div class="modal-actions"><button type="button" class="button button-quiet" (click)="closed.emit()">Cancelar</button><button class="button button-primary" type="submit" [disabled]="isSubmitting">{{ isSubmitting ? 'Salvando...' : (usuario ? 'Salvar alterações' : 'Criar usuário') }}</button></div>
+    </form>
+  </section>
+</div>

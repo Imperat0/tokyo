@@ -1,0 +1,40 @@
+<div class="modal-backdrop" (click)="closed.emit()">
+  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="address-modal-title" (click)="$event.stopPropagation()">
+    <div class="modal-heading"><div><span class="eyebrow">ENDEREÇO</span><h2 id="address-modal-title">{{ endereco ? 'Editar endereço' : 'Adicionar endereço' }}</h2></div><button type="button" class="modal-close" (click)="closed.emit()" aria-label="Fechar">×</button></div>
+    <p class="modal-intro">Informe o CEP e o número. O ViaCEP valida e completa os dados ao salvar.</p>
+    <form class="form-stack modal-form" (ngSubmit)="submit()">
+      @if (isAdmin && !endereco) {
+        <label for="address-user">Vincular ao usuário</label>
+        <select id="address-user" name="addressUserId" [ngModel]="usuarioId"
+          (ngModelChange)="onUsuarioChange($event)" required>
+          <option [ngValue]="null" disabled>Selecione um usuário</option>
+          @if (usuarioSelecionadoForaDaPagina && usuarioSelecionado) {
+            <option [ngValue]="usuarioSelecionado.id">{{ usuarioSelecionado.nome }} · {{ usuarioSelecionado.email }} (selecionado)</option>
+          }
+          @for (usuario of usuarios; track usuario.id) { <option [ngValue]="usuario.id">{{ usuario.nome }} · {{ usuario.email }}</option> }
+        </select>
+        @if (carregandoUsuarios) {
+          <div class="table-loading selector-loading"><span class="spinner"></span> Carregando usuários...</div>
+        } @else if (paginaUsuarios && paginaUsuarios.totalPages > 1) {
+          <div class="selector-pagination">
+            <span>Página {{ paginaUsuarios.page + 1 }} de {{ paginaUsuarios.totalPages }}</span>
+            <div>
+              <button type="button" class="page-button" [disabled]="paginaUsuarios.first"
+                (click)="usuariosPageChange.emit(paginaUsuarios.page - 1)">← Anterior</button>
+              <button type="button" class="page-button" [disabled]="paginaUsuarios.last"
+                (click)="usuariosPageChange.emit(paginaUsuarios.page + 1)">Próxima →</button>
+            </div>
+          </div>
+        }
+      }
+      <div class="form-row">
+        <div><label for="address-cep">CEP</label><input id="address-cep" type="text" name="addressCep" [(ngModel)]="formulario.cep" placeholder="00000-000" inputmode="numeric" autocomplete="postal-code" required maxlength="9" pattern="[0-9]{5}-?[0-9]{3}"></div>
+        <div><label for="address-number">Número</label><input id="address-number" type="text" name="addressNumber" [(ngModel)]="formulario.numero" placeholder="Ex.: 120" required maxlength="20"></div>
+      </div>
+      <label for="address-complement">Complemento <span class="label-optional">opcional</span></label>
+      <input id="address-complement" type="text" name="addressComplement" [(ngModel)]="formulario.complemento" placeholder="Apartamento, bloco..." maxlength="100">
+      <div class="cep-note"><span>✳</span><p>Logradouro, bairro, cidade e estado são preenchidos automaticamente pela consulta ao ViaCEP no servidor.</p></div>
+      <div class="modal-actions"><button type="button" class="button button-quiet" (click)="closed.emit()">Cancelar</button><button class="button button-primary" type="submit" [disabled]="isSubmitting">{{ isSubmitting ? 'Validando CEP...' : (endereco ? 'Salvar alterações' : 'Adicionar endereço') }}</button></div>
+    </form>
+  </section>
+</div>

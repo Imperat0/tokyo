@@ -1,0 +1,126 @@
+@if (isInitializing()) {
+  <main class="boot-screen">
+    <span class="spinner"></span>
+    <p>Preparando seu espaço...</p>
+  </main>
+} @else if (!currentUser) {
+  <app-auth-page
+    (authenticated)="onAuthenticated($event)"
+    (feedback)="onAuthFeedback($event)" />
+} @else {
+  <div class="app-shell">
+    <app-sidebar
+      [currentUser]="currentUser"
+      [isAdmin]="isAdmin"
+      [activeSection]="activeSection"
+      [usersCount]="usuariosPage.totalElements"
+      [addressesCount]="enderecosPage.totalElements"
+      (sectionChange)="changeSection($event)"
+      (profileClick)="openProfile()"
+      (signOut)="signOut()" />
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="breadcrumb"><span>Tokyo</span><span class="crumb-separator">/</span><strong>{{ pageTitle }}</strong></div>
+        <div class="topbar-actions">
+          <span class="today-label">{{ currentUser.email }}</span>
+          <button class="icon-button notification-button" type="button" aria-label="Notificações">♧<i></i></button>
+          <button type="button" class="avatar avatar-small" (click)="openProfile()" [attr.aria-label]="'Perfil de ' + currentUser.nome">
+            {{ currentUser.nome.slice(0, 1).toUpperCase() }}
+          </button>
+          <button type="button" class="mobile-logout" (click)="signOut()">Sair</button>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <section class="page-heading">
+          <div>
+            <span class="eyebrow">PAINEL DE CONTROLE</span>
+            <h1>{{ activeSection === 'overview' ? 'Olá, ' + currentUser.nome.split(' ')[0] + ' 👋' : pageTitle }}</h1>
+            <p>
+              @if (activeSection === 'overview') { Aqui está um resumo do que acontece no seu espaço hoje. }
+              @else if (activeSection === 'users') { Gerencie as pessoas que fazem parte da sua operação. }
+              @else { Consulte e organize os endereços cadastrados. }
+            </p>
+          </div>
+          <div class="heading-actions">
+            @if (activeSection === 'users' && isAdmin) {
+              <button class="button button-primary" type="button" (click)="openNewUser()"><span>＋</span> Novo usuário</button>
+            } @else if (activeSection === 'addresses') {
+              <button class="button button-primary" type="button" (click)="openNewAddress()"><span>＋</span> Novo endereço</button>
+            }
+          </div>
+        </section>
+
+        @if (activeSection === 'overview') {
+          <app-overview
+            [isAdmin]="isAdmin"
+            [isLoading]="isLoading()"
+            [usuarios]="usuariosPage"
+            [usuariosRecentes]="usuariosRecentes"
+            [enderecos]="enderecosPage"
+            (sectionChange)="changeSection($event)"
+            (viewUserAddresses)="viewUserAddresses($event)"
+            (addAddress)="openNewAddress()"
+            (editAddress)="openEditAddress($event)" />
+        } @else if (activeSection === 'users' && isAdmin) {
+          <app-usuarios-list
+            [pagina]="usuariosPage"
+            [isLoading]="isLoading()"
+            [ordenacao]="userSort"
+            (edit)="openEditUser($event)"
+            (delete)="deleteUser($event)"
+            (viewAddresses)="viewUserAddresses($event)"
+            (sortChange)="changeUserSort($event)"
+            (pageChange)="changeUserPage($event)" />
+        } @else {
+          <app-enderecos-list
+            [pagina]="enderecosPage"
+            [isAdmin]="isAdmin"
+            [isLoading]="isLoading()"
+            [ordenacao]="addressSort"
+            [vendoUsuario]="viewingUser"
+            [usuarios]="usuariosPage.content"
+            (edit)="openEditAddress($event)"
+            (delete)="deleteAddress($event)"
+            (showAll)="showAllAddresses()"
+            (sortChange)="changeAddressSort($event)"
+            (pageChange)="changeAddressPage($event)" />
+        }
+
+        <footer class="page-footer"><span>Tokyo <span class="brand-dot">.</span></span><span>Um espaço mais simples para organizar o dia a dia.</span></footer>
+      </div>
+    </main>
+  </div>
+}
+
+@if (modal === 'user') {
+  <app-usuario-form-dialog
+    [usuario]="editingUser"
+    [isSubmitting]="isSubmitting()"
+    (saved)="submitUser($event)"
+    (closed)="closeModal()" />
+}
+
+@if (modal === 'address') {
+  <app-endereco-form-dialog
+    [endereco]="editingAddress"
+    [usuarios]="addressUsersPage.content"
+    [paginaUsuarios]="addressUsersPage"
+    [carregandoUsuarios]="isLoadingAddressUsers()"
+    [isAdmin]="isAdmin"
+    [isSubmitting]="isSubmitting()"
+    [usuarioSelecionado]="addressSelectedUser"
+    (usuarioChange)="selectAddressUser($event)"
+    (usuariosPageChange)="loadAddressSelectorUsers($event)"
+    (saved)="submitAddress($event)"
+    (closed)="closeModal()" />
+}
+
+@if (toastMessage()) {
+  <div class="toast" [class.toast-error]="toastType() === 'error'" role="status">
+    <span class="toast-mark">{{ toastType() === 'error' ? '!' : '✓' }}</span>
+    <span>{{ toastMessage() }}</span>
+    <button type="button" (click)="toastMessage.set('')" aria-label="Fechar mensagem">×</button>
+  </div>
+}

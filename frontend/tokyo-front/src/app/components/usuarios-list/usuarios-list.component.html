@@ -1,0 +1,40 @@
+<section class="content-card">
+  <div class="card-heading card-heading-list">
+    <div><h2>Todos os usuários <span class="total-pill">{{ pagina.totalElements }}</span></h2><p>Gerencie perfis e endereços da plataforma</p></div>
+    <label class="sort-control">Ordenar por
+      <select [value]="ordenacao" (change)="onSortChange($event)">
+        <option value="nome,asc">Nome (A–Z)</option>
+        <option value="nome,desc">Nome (Z–A)</option>
+        <option value="email,asc">E-mail (A–Z)</option>
+        <option value="createdAt,desc">Mais recentes</option>
+        <option value="createdAt,asc">Mais antigos</option>
+      </select>
+    </label>
+  </div>
+  @if (isLoading) {
+    <div class="table-loading"><span class="spinner"></span> Carregando usuários...</div>
+  } @else if (pagina.content.length === 0) {
+    <div class="empty-state"><span class="empty-icon">♙</span><strong>Nenhum usuário encontrado</strong><span>Cadastre o primeiro usuário da plataforma.</span></div>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>USUÁRIO</th><th>PERFIL</th><th>CRIADO EM</th><th>ENDEREÇOS</th><th>AÇÕES</th></tr></thead>
+        <tbody>
+          @for (usuario of pagina.content; track usuario.id) {
+            <tr>
+              <td><div class="person-cell"><span class="avatar avatar-table">{{ usuario.nome.slice(0, 1).toUpperCase() }}</span><span><strong>{{ usuario.nome }}</strong><small>{{ usuario.email }}</small></span></div></td>
+              <td><span class="role-badge" [class.role-admin]="usuario.perfil === 'ADMIN'">{{ usuario.perfil === 'ADMIN' ? 'Admin' : 'Usuário' }}</span></td>
+              <td>{{ usuario.createdAt | date: 'dd/MM/yyyy' }}</td>
+              <td><button class="inline-link" type="button" (click)="viewAddresses.emit(usuario)">Ver endereços <span>→</span></button></td>
+              <td><div class="table-actions"><button type="button" class="row-action" (click)="edit.emit(usuario)" [attr.aria-label]="'Editar ' + usuario.nome">✎</button><button type="button" class="row-action danger-action" (click)="delete.emit(usuario)" [attr.aria-label]="'Excluir ' + usuario.nome">×</button></div></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <span>Mostrando {{ pagina.content.length }} de {{ pagina.totalElements }} usuários</span>
+      <div><button type="button" class="page-button" [disabled]="pagina.first" (click)="pageChange.emit(pagina.page - 1)">← Anterior</button><span class="page-number">{{ pagina.page + 1 }} / {{ pagina.totalPages || 1 }}</span><button type="button" class="page-button" [disabled]="pagina.last" (click)="pageChange.emit(pagina.page + 1)">Próxima →</button></div>
+    </div>
+  }
+</section>
